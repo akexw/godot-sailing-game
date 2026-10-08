@@ -49,21 +49,21 @@ func _physics_process(delta: float) -> void:
 	rotation.y = current_heading
 
 	# Apparent wind from true wind minus boat motion
-	var apparent_wind := compute_apparent_wind()
+	var apparent_wind: Vector3 = compute_apparent_wind()
 
 	# Compute sail force based on wind angle and trim
-	var sail_force := compute_sail_force(apparent_wind, sail_trim)
+	var sail_force: Dictionary = compute_sail_force(apparent_wind, sail_trim)
 
 	# Heel smoothly follows sail force
 	current_heel = lerp(current_heel, sail_force["heel"], heel_recovery_speed * delta)
 	rotation.z = current_heel
 
 	# Apply acceleration in the boat's local frame
-	var boat_forward := -transform.basis.z.normalized()
-	var boat_right := transform.basis.x.normalized()
-	var thrust_vector := boat_forward * sail_force["drive"] + boat_right * sail_force["drift"]
+	var boat_forward: Vector3 = -transform.basis.z.normalized()
+	var boat_right: Vector3 = transform.basis.x.normalized()
+	var thrust_vector: Vector3 = boat_forward * sail_force["drive"] + boat_right * sail_force["drift"]
 
-	var desired_velocity := boat_velocity + thrust_vector * acceleration * delta
+	var desired_velocity: Vector3 = boat_velocity + thrust_vector * acceleration * delta
 	boat_velocity = boat_velocity.lerp(desired_velocity, 1.0 - water_drag)
 	boat_velocity = boat_velocity.lerp(Vector3.ZERO, water_drag * delta)
 
@@ -77,7 +77,7 @@ func _physics_process(delta: float) -> void:
 		position.y = ocean.get_ocean_height(position.x, position.z) + bob + 1.1
 
 func compute_apparent_wind() -> Vector3:
-	var true_wind := wind_direction.normalized() * wind_strength
+	var true_wind: Vector3 = wind_direction.normalized() * wind_strength
 	var gust := sin(Time.get_ticks_msec() * 0.001 * wind_gust_speed) * wind_gust_scale
 	true_wind *= 1.0 + gust * 0.1
 
@@ -85,7 +85,7 @@ func compute_apparent_wind() -> Vector3:
 	return true_wind - boat_velocity
 
 func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
-	var local_wind := transform.basis.inverse() * apparent_wind
+	var local_wind: Vector3 = transform.basis.inverse() * apparent_wind
 	var wind_speed := local_wind.length()
 
 	if wind_speed < 0.1:
