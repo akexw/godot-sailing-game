@@ -18,6 +18,8 @@ class_name Boat
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
 @export_range(0.0, 2.0) var heel_recovery_speed: float = 1.2
 @export var sail_max_angle: float = 0.9
+@export_range(0.0, 1.57) var head_to_wind_zone: float = 0.52  # ~30 degrees in radians
+@export_range(1.0, 10.0) var head_to_wind_penalty_strength: float = 3.0
 
 # Ocean and bob
 @export var bob_amount: float = 0.35
@@ -97,10 +99,18 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 		return {"drive": 0.0, "drift": 0.0, "heel": 0.0}
 
 	var wind_angle: float = atan2(local_wind.x, -local_wind.z)
-	var head_to_wind_penalty: float = max(0.0, 1.0 - abs(wind_angle) / 0.52)
+	
+	# Graduated head-to-wind penalty: stronger penalty as boat points closer to wind
+	var abs_wind_angle: float = abs(wind_angle)
+	var head_to_wind_penalty: float = 0.0
+	if abs_wind_angle < head_to_wind_zone:
+		# Smooth penalty curve: pow(1 - angle/zone, strength) creates stronger penalty close to wind
+		var normalized_angle: float = abs_wind_angle / head_to_wind_zone
+		head_to_wind_penalty = pow(1.0 - normalized_angle, head_to_wind_penalty_strength)
+	
 	var sail_angle: float = lerp(0.3, 0.05, trim)
-	var angle_factor: float = max(0.0, cos(wind_angle - sail_angle) * (1.0 - head_to_wind_penalty * 0.5))
-	var drive: float = angle_factor * wind_speed * trim * 0.8
+	var angle_factor: float = max(0.0, cos(wind_angle - sail_angle))
+	var drive: float = angle_factor * wind_speed * trim * 0.8 * (1.0 - head_to_wind_penalty)
 	var lateral: float = sin(wind_angle) * wind_speed * (1.0 - abs(sail_angle)) * 0.6
 	var heel: float = clamp(-lateral * 0.15, -max_heel_angle, max_heel_angle)
 
