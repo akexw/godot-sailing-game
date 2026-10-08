@@ -102,7 +102,7 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	var angle_factor: float = max(0.0, cos(wind_angle - sail_angle) * (1.0 - head_to_wind_penalty * 0.5))
 	var drive: float = angle_factor * wind_speed * trim * 0.8
 	var lateral: float = sin(wind_angle) * wind_speed * (1.0 - abs(sail_angle)) * 0.6
-	var heel: float = clamp(lateral * 0.15, -max_heel_angle, max_heel_angle)
+	var heel: float = clamp(-lateral * 0.15, -max_heel_angle, max_heel_angle)
 
 	return {
 		"drive": drive,
