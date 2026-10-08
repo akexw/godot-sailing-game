@@ -1,9 +1,12 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
 [ext_resource type="Script" path="res://scripts/boat.gd" id="2_qqxp0"]
 [ext_resource type="Script" path="res://scripts/camera_controller.gd" id="3_x5jot"]
 [ext_resource type="Script" path="res://scripts/wind_system.gd" id="4_wind"]
+[ext_resource type="Script" path="res://scripts/race_manager.gd" id="5_race"]
+[ext_resource type="Script" path="res://scripts/island_manager.gd" id="6_islands"]
+[ext_resource type="Script" path="res://scripts/ui_hud.gd" id="7_hud"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(2, 1, 4)
@@ -32,6 +35,14 @@ wind_direction = Vector3(1, 0, -0.5)
 wind_strength = 12.0
 wind_gust_speed = 0.3
 wind_gust_scale = 3.0
+unique_name_in_group = true
+
+[node name="Islands" type="Node3D" parent="."]
+script = ExtResource("6_islands")
+
+[node name="RaceManager" type="Node3D" parent="."]
+script = ExtResource("5_race")
+unique_name_in_group = true
 
 [node name="Boat" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
@@ -53,3 +64,6 @@ transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 8, 12)
 current = true
 fov = 60.0
 script = ExtResource("3_x5jot")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("7_hud")
