@@ -111,11 +111,10 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	
 	# Sail efficiency drops sharply within 30 degrees of head-to-wind
 	var head_to_wind_penalty = max(0.0, 1.0 - abs(wind_angle) / 0.52)  # 0.52 rad ≈ 30°
-	var close_hauled_factor = pow(1.0 - head_to_wind_penalty, 2.0)
 	
 	# Sail angle: trim controls how close to the wind we can sail
 	var sail_angle = lerp(0.3, 0.05, trim)  # Trimmed in = tighter to wind
-	var angle_factor = max(0.0, cos(wind_angle - sail_angle) * (1.0 - close_hauled_penalty * 0.5))
+	var angle_factor = max(0.0, cos(wind_angle - sail_angle) * (1.0 - head_to_wind_penalty * 0.5))
 	
 	# Drive force (forward)
 	var drive = angle_factor * wind_speed * trim * 0.8
