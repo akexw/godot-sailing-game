@@ -22,9 +22,16 @@ func _draw() -> void:
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin), "Speed: %.1f kt" % speed, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 30), "Trim: %.0f%%" % (boat.sail_trim * 100), HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
-	var wind_dir: Vector3 = wind_system.wind_direction if wind_system else Vector3.ZERO
-	var wind_angle_deg: float = rad_to_deg(atan2(wind_dir.x, -wind_dir.z))
-	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 60), "Wind: %.0f°" % wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	# Use boat's wind direction (true wind) for display
+	var true_wind_dir: Vector3 = boat.wind_direction
+	var true_wind_angle_deg: float = rad_to_deg(atan2(true_wind_dir.x, -true_wind_dir.z))
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 60), "True Wind: %.0f°" % true_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+
+	# Calculate apparent wind angle relative to boat
+	var apparent_wind: Vector3 = boat.compute_apparent_wind()
+	var local_apparent_wind: Vector3 = boat.transform.basis.inverse() * apparent_wind
+	var apparent_wind_angle_deg: float = rad_to_deg(atan2(local_apparent_wind.x, -local_apparent_wind.z))
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 90), "App Wind: %.0f°" % apparent_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	draw_wind_compass(Vector2(screen_size.x - 120, margin + 40))
 
@@ -38,13 +45,13 @@ func _draw() -> void:
 
 func draw_wind_compass(center: Vector2) -> void:
 	var radius: float = 30.0
-	var wind_dir: Vector3 = wind_system.wind_direction if wind_system else Vector3.ZERO
-	var wind_angle: float = atan2(wind_dir.x, -wind_dir.z)
+	var true_wind_dir: Vector3 = boat.wind_direction
+	var true_wind_angle: float = atan2(true_wind_dir.x, -true_wind_dir.z)
 
 	draw_circle(center, radius, Color.DARK_GRAY)
 	draw_circle(center, radius, Color.WHITE, false, 2.0)
 	draw_string(ThemeDB.fallback_font, center + Vector2(0, -radius - 15), "N", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
 
-	var wind_end: Vector2 = center + Vector2(sin(wind_angle), -cos(wind_angle)) * (radius - 5)
+	var wind_end: Vector2 = center + Vector2(sin(true_wind_angle), -cos(true_wind_angle)) * (radius - 5)
 	draw_line(center, wind_end, Color.LIGHT_BLUE, 3.0)
 	draw_circle(wind_end, 4.0, Color.LIGHT_BLUE)
