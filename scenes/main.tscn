@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
 [ext_resource type="Script" path="res://scripts/boat.gd" id="2_qqxp0"]
 [ext_resource type="Script" path="res://scripts/camera_controller.gd" id="3_x5jot"]
+[ext_resource type="Script" path="res://scripts/wind_system.gd" id="4_wind"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(2, 1, 4)
@@ -25,9 +26,23 @@ amplitude = 0.8
 speed = 0.8
 frequency = 1.2
 
+[node name="WindSystem" type="Node3D" parent="."]
+script = ExtResource("4_wind")
+wind_direction = Vector3(1, 0, -0.5)
+wind_strength = 12.0
+wind_gust_speed = 0.3
+wind_gust_scale = 3.0
+
 [node name="Boat" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 script = ExtResource("2_qqxp0")
+max_speed = 20.0
+acceleration = 8.0
+rudder_turn_speed = 1.8
+water_drag = 0.15
+drift_factor = 0.25
+max_heel_angle = 0.45
+heel_recovery_speed = 1.2
 
 [node name="Hull" type="MeshInstance3D" parent="Boat"]
 mesh = SubResource("BoxMesh_1")
