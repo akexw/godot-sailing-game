@@ -21,10 +21,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	lap_time += delta
-	
+
 	if boat and current_waypoint < waypoints.size():
-		var distance_to_waypoint = boat.global_position.distance_to(waypoints[current_waypoint])
-		
+		var distance_to_waypoint: float = boat.global_position.distance_to(waypoints[current_waypoint])
 		if distance_to_waypoint < waypoint_radius:
 			current_waypoint += 1
 			if current_waypoint >= waypoints.size():
@@ -39,6 +38,6 @@ func get_distance_to_waypoint(position: Vector3) -> float:
 
 func get_waypoint_heading(position: Vector3) -> float:
 	if current_waypoint < waypoints.size():
-		var direction = waypoints[current_waypoint] - position
+		var direction: Vector3 = waypoints[current_waypoint] - position
 		return rad_to_deg(atan2(direction.x, -direction.z))
 	return 0.0

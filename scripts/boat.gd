@@ -22,7 +22,7 @@ class_name Boat
 @export var bob_amount: float = 0.35
 @export var bob_speed: float = 2.0
 
-@onready var ocean: OceanMesh = get_tree().get_first_node_in_group("ocean")
+@onready var ocean: OceanMesh = get_tree().get_first_node_in_group("ocean") as OceanMesh
 
 # State
 var sail_trim: float = 0.5
@@ -36,32 +36,23 @@ func _ready() -> void:
 	current_heading = rotation.y
 
 func _physics_process(delta: float) -> void:
-	# Input
-	var turn_input := input_axis("turn_left", "turn_right")
-	var trim_input := input_axis("move_forward", "move_backward")
+	var turn_input: float = input_axis("turn_left", "turn_right")
+	var trim_input: float = input_axis("move_forward", "move_backward")
 
-	# Sail trim: W = trim in, S = ease out
 	sail_trim = clamp(sail_trim + trim_input * 1.2 * delta, 0.0, 1.0)
-
-	# Rudder input and heading update
 	rudder_angle = lerp(rudder_angle, turn_input, 0.15)
 	current_heading += rudder_angle * rudder_turn_speed * delta
 	rotation.y = current_heading
 
-	# Apparent wind from true wind minus boat motion
 	var apparent_wind: Vector3 = compute_apparent_wind()
-
-	# Compute sail force based on wind angle and trim
 	var sail_force: Dictionary = compute_sail_force(apparent_wind, sail_trim)
 
-	# Heel smoothly follows sail force
-	current_heel = lerp(current_heel, sail_force["heel"], heel_recovery_speed * delta)
+	current_heel = lerp(current_heel, float(sail_force["heel"]), heel_recovery_speed * delta)
 	rotation.z = current_heel
 
-	# Apply acceleration in the boat's local frame
 	var boat_forward: Vector3 = -transform.basis.z.normalized()
 	var boat_right: Vector3 = transform.basis.x.normalized()
-	var thrust_vector: Vector3 = boat_forward * sail_force["drive"] + boat_right * sail_force["drift"]
+	var thrust_vector: Vector3 = boat_forward * float(sail_force["drive"]) + boat_right * float(sail_force["drift"])
 
 	var desired_velocity: Vector3 = boat_velocity + thrust_vector * acceleration * delta
 	boat_velocity = boat_velocity.lerp(desired_velocity, 1.0 - water_drag)
@@ -73,41 +64,29 @@ func _physics_process(delta: float) -> void:
 	position += boat_velocity * delta
 
 	if ocean:
-		var bob := sin(Time.get_ticks_msec() * 0.001 * bob_speed) * bob_amount
+		var bob: float = sin(Time.get_ticks_msec() * 0.001 * bob_speed) * bob_amount
 		position.y = ocean.get_ocean_height(position.x, position.z) + bob + 1.1
 
 func compute_apparent_wind() -> Vector3:
 	var true_wind: Vector3 = wind_direction.normalized() * wind_strength
-	var gust := sin(Time.get_ticks_msec() * 0.001 * wind_gust_speed) * wind_gust_scale
+	var gust: float = sin(Time.get_ticks_msec() * 0.001 * wind_gust_speed) * wind_gust_scale
 	true_wind *= 1.0 + gust * 0.1
-
-	# Apparent wind = true wind - boat velocity
 	return true_wind - boat_velocity
 
 func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	var local_wind: Vector3 = transform.basis.inverse() * apparent_wind
-	var wind_speed := local_wind.length()
+	var wind_speed: float = local_wind.length()
 
 	if wind_speed < 0.1:
 		return {"drive": 0.0, "drift": 0.0, "heel": 0.0}
 
-	# Wind angle relative to the bow:
-	# negative/positive values mean wind comes from port/starboard side
-	var wind_angle := atan2(local_wind.x, -local_wind.z)
-
-	# The closer to head-to-wind, the worse the sail works.
-	var head_to_wind_penalty := max(0.0, 1.0 - abs(wind_angle) / 0.52)
-
-	# Sail trim adjusts how close to the wind the boat can point.
-	var sail_angle := lerp(0.3, 0.05, trim)
-	var angle_factor := max(0.0, cos(wind_angle - sail_angle) * (1.0 - head_to_wind_penalty * 0.5))
-
-	# Drive is strongest off the beam / broad reach, weak close to the wind.
-	var drive := angle_factor * wind_speed * trim * 0.8
-
-	# Lateral force creates drift and heel.
-	var lateral := sin(wind_angle) * wind_speed * (1.0 - abs(sail_angle)) * 0.6
-	var heel := clamp(lateral * 0.15, -max_heel_angle, max_heel_angle)
+	var wind_angle: float = atan2(local_wind.x, -local_wind.z)
+	var head_to_wind_penalty: float = max(0.0, 1.0 - abs(wind_angle) / 0.52)
+	var sail_angle: float = lerp(0.3, 0.05, trim)
+	var angle_factor: float = max(0.0, cos(wind_angle - sail_angle) * (1.0 - head_to_wind_penalty * 0.5))
+	var drive: float = angle_factor * wind_speed * trim * 0.8
+	var lateral: float = sin(wind_angle) * wind_speed * (1.0 - abs(sail_angle)) * 0.6
+	var heel: float = clamp(lateral * 0.15, -max_heel_angle, max_heel_angle)
 
 	return {
 		"drive": drive,
@@ -116,7 +95,7 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	}
 
 func input_axis(neg_name: String, pos_name: String) -> float:
-	var value := 0.0
+	var value: float = 0.0
 	if Input.is_action_pressed(neg_name):
 		value -= 1.0
 	if Input.is_action_pressed(pos_name):

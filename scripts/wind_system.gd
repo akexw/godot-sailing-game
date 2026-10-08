@@ -8,7 +8,7 @@ extends Node3D
 var boat: Boat
 
 func _ready() -> void:
-	boat = get_tree().get_first_node_in_group("boat")
+	boat = get_tree().get_first_node_in_group("boat") as Boat
 	if boat:
 		boat.wind_direction = wind_direction
 		boat.wind_strength = wind_strength
