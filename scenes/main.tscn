@@ -1,53 +1,40 @@
-[gd_scene load_steps=8 format=3 uid="uid://d1wqdl68rqge4"]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/ocean_mesh.gd" id="1_3q2mj"]
-[ext_resource type="Script" path="res://scripts/boat.gd" id="2_qrgrx"]
-[ext_resource type="Script" path="res://scripts/camera_controller.gd" id="3_gpy37"]
+[ext_resource type="Script" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
+[ext_resource type="Script" path="res://scripts/boat.gd" id="2_qqxp0"]
+[ext_resource type="Script" path="res://scripts/camera_controller.gd" id="3_x5jot"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_hjm3c"]
-size = Vector2(128, 128)
-subdivisions = Vector2i(128, 128)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x2o57"]
-albedo_color = Color(0, 0.5, 0.8, 1)
-metallic = 0.5
-roughness = 0.2
-shading_mode = 0
-
-[sub_resource type="BoxMesh" id="BoxMesh_dj1kn"]
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(2, 1, 4)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wv8f4"]
-albedo_color = Color(0.8, 0.2, 0.2, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.8, 0.35, 0.2, 1)
 
 [node name="Main" type="Node3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707107, -0.408248, 0.57735, 0, 0.816497, 0.57735, -1, -0.408248, 0.57735, 0, 20, 0)
-energy_multiplier = 2.0
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+transform = Transform3D(0.707107, -0.408248, 0.57735, 0, 0.816497, 0.57735, -0.707107, -0.408248, 0.57735, 0, 20, 0)
+light_energy = 2.0
+sky_mode = 1
 
 [node name="Ocean" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_hjm3c")
-material_override = SubResource("StandardMaterial3D_x2o57")
-script = ExtResource("1_3q2mj")
-unique_name_in_group = true
-
-[node name="Ocean" type="Node" parent="."]
-unique_name_in_group = true
+script = ExtResource("1_qlv2c")
+size = Vector2(200, 200)
+subdivisions = 120
+amplitude = 0.8
+speed = 0.8
+frequency = 1.2
 
 [node name="Boat" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-script = ExtResource("2_qrgrx")
-unique_name_in_group = true
+script = ExtResource("2_qqxp0")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Boat"]
-mesh = SubResource("BoxMesh_dj1kn")
-material_override = SubResource("StandardMaterial3D_wv8f4")
+[node name="Hull" type="MeshInstance3D" parent="Boat"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
 
-[node name="Camera3D" type="Camera3D" parent="Boat"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-script = ExtResource("3_gpy37")
-
-[connection signal="mesh_changed" from="Ocean" to="Ocean" method="_on_mesh_changed"]
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 8, 12)
+current = true
+fov = 60.0
+script = ExtResource("3_x5jot")
