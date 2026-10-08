@@ -50,30 +50,42 @@ func _draw() -> void:
 func draw_wind_compass(center: Vector2) -> void:
 	var radius: float = 30.0
 	
-	# True wind direction in world space (fixed north reference)
+	# True wind direction in world space
 	var true_wind_dir: Vector3 = boat.wind_direction
 	var true_wind_angle: float = atan2(true_wind_dir.x, -true_wind_dir.z)
 	
 	# Boat heading in world space
 	var boat_heading: float = boat.current_heading
 	
+	# Compass rose angle relative to boat heading (boat always points up)
+	var compass_rotation: float = -boat_heading
+	
 	# Draw compass circle
 	draw_circle(center, radius, Color.DARK_GRAY)
 	draw_circle(center, radius, Color.WHITE, false, 2.0)
 	
-	# North always points up (fixed compass rose)
-	draw_string(ThemeDB.fallback_font, center + Vector2(0, -radius - 15), "N", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
+	# Draw boat heading indicator (always pointing up)
+	draw_line(center, center + Vector2(0, -radius + 5), Color.RED, 3.0)
+	draw_circle(center + Vector2(0, -radius + 5), 4.0, Color.RED)
 	
-	# Draw cardinal directions on compass
-	draw_string(ThemeDB.fallback_font, center + Vector2(radius + 10, 0), "E", HORIZONTAL_ALIGNMENT_CENTER, -1, 10, Color.GRAY)
-	draw_string(ThemeDB.fallback_font, center + Vector2(-radius - 10, 0), "W", HORIZONTAL_ALIGNMENT_CENTER, -1, 10, Color.GRAY)
+	# Draw cardinal directions rotated relative to boat heading
+	var north_angle: float = compass_rotation
+	var east_angle: float = compass_rotation + PI * 0.5
+	var south_angle: float = compass_rotation + PI
+	var west_angle: float = compass_rotation + PI * 1.5
 	
-	# Wind arrow in world-fixed direction (north is up)
-	var wind_end: Vector2 = center + Vector2(sin(true_wind_angle), -cos(true_wind_angle)) * (radius - 5)
+	var north_pos: Vector2 = center + Vector2(sin(north_angle), -cos(north_angle)) * (radius - 12)
+	var east_pos: Vector2 = center + Vector2(sin(east_angle), -cos(east_angle)) * (radius - 12)
+	var south_pos: Vector2 = center + Vector2(sin(south_angle), -cos(south_angle)) * (radius - 12)
+	var west_pos: Vector2 = center + Vector2(sin(west_angle), -cos(west_angle)) * (radius - 12)
+	
+	draw_string(ThemeDB.fallback_font, north_pos, "N", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
+	draw_string(ThemeDB.fallback_font, east_pos, "E", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.GRAY)
+	draw_string(ThemeDB.fallback_font, south_pos, "S", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.GRAY)
+	draw_string(ThemeDB.fallback_font, west_pos, "W", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.GRAY)
+	
+	# Wind arrow rotates with compass (relative to boat heading)
+	var wind_angle_relative: float = true_wind_angle - boat_heading
+	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), -cos(wind_angle_relative)) * (radius - 5)
 	draw_line(center, wind_end, Color.LIGHT_BLUE, 3.0)
 	draw_circle(wind_end, 4.0, Color.LIGHT_BLUE)
-	
-	# Boat heading indicator (where boat is pointing relative to north)
-	var boat_end: Vector2 = center + Vector2(sin(boat_heading), -cos(boat_heading)) * (radius - 8)
-	draw_line(center, boat_end, Color.RED, 2.0)
-	draw_circle(boat_end, 3.0, Color.RED)
