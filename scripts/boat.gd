@@ -17,12 +17,16 @@ class_name Boat
 # Sail and heel
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
 @export_range(0.0, 2.0) var heel_recovery_speed: float = 1.2
+@export var sail_max_angle: float = 0.9
 
 # Ocean and bob
 @export var bob_amount: float = 0.35
 @export var bob_speed: float = 2.0
 
 @onready var ocean: OceanMesh = get_tree().get_first_node_in_group("ocean") as OceanMesh
+@onready var sail_mesh: MeshInstance3D = $Sail
+@onready var mast_mesh: MeshInstance3D = $Mast
+@onready var hull_mesh: MeshInstance3D = $Hull
 
 # State
 var sail_trim: float = 0.5
@@ -34,6 +38,10 @@ var rudder_angle: float = 0.0
 func _ready() -> void:
 	add_to_group("boat")
 	current_heading = rotation.y
+	if mast_mesh:
+		mast_mesh.position = Vector3(0.0, 1.0, 0.0)
+	if sail_mesh:
+		sail_mesh.position = Vector3(0.0, 1.5, 0.0)
 
 func _physics_process(delta: float) -> void:
 	var turn_input: float = input_axis("turn_left", "turn_right")
@@ -62,6 +70,14 @@ func _physics_process(delta: float) -> void:
 		boat_velocity = boat_velocity.normalized() * max_speed
 
 	position += boat_velocity * delta
+
+	if sail_mesh:
+		var sail_rotation: float = lerp(-sail_max_angle, sail_max_angle, sail_trim)
+		sail_mesh.rotation.z = sail_rotation + current_heel
+		sail_mesh.rotation.x = -0.25
+		sail_mesh.rotation.y = deg_to_rad(90.0)
+		if mast_mesh:
+			mast_mesh.rotation.z = current_heel
 
 	if ocean:
 		var bob: float = sin(Time.get_ticks_msec() * 0.001 * bob_speed) * bob_amount

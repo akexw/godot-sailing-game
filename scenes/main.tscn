@@ -9,10 +9,23 @@
 [ext_resource type="Script" path="res://scripts/ui_hud.gd" id="7_hud"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(2, 1, 4)
+size = Vector3(2, 0.8, 4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.8, 0.35, 0.2, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+radius = 0.08
+height = 4.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.5, 0.35, 0.2, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
+size = Vector2(2.5, 3.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
+albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 
 [node name="Main" type="Node3D"]
 
@@ -54,10 +67,21 @@ water_drag = 0.15
 drift_factor = 0.25
 max_heel_angle = 0.45
 heel_recovery_speed = 1.2
+sail_max_angle = 0.9
 
 [node name="Hull" type="MeshInstance3D" parent="Boat"]
 mesh = SubResource("BoxMesh_1")
 material_override = SubResource("StandardMaterial3D_1")
+
+[node name="Mast" type="MeshInstance3D" parent="Boat"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("CylinderMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+
+[node name="Sail" type="MeshInstance3D" parent="Boat"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("PlaneMesh_1")
+material_override = SubResource("StandardMaterial3D_3")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 8, 12)
