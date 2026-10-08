@@ -1,4 +1,4 @@
-extends CanvasLayer
+extends Control
 
 var boat: Boat
 var wind_system: Node3D
@@ -6,6 +6,7 @@ var wind_system: Node3D
 func _ready() -> void:
 	boat = get_tree().get_first_node_in_group("boat") as Boat
 	wind_system = get_tree().get_first_node_in_group("wind_system")
+	set_process(true)
 
 func _process(_delta: float) -> void:
 	queue_redraw()
