@@ -65,5 +65,5 @@ current = true
 fov = 60.0
 script = ExtResource("3_x5jot")
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="Control" parent="."]
 script = ExtResource("7_hud")
