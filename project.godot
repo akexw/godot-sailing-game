@@ -1,0 +1,21 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   property=value ; assign values to properties
+
+config_version=5
+
+[application]
+
+config/name="Sailing Game"
+config/description="A sailing game with dynamic ocean mesh in Godot"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+config/icon="res://icon.svg"
+
+[physics]
+
+3d/default_gravity=9.8
