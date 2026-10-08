@@ -26,7 +26,6 @@ class_name Boat
 @onready var ocean: OceanMesh = get_tree().get_first_node_in_group("ocean") as OceanMesh
 @onready var sail_mesh: MeshInstance3D = $Sail
 @onready var mast_mesh: MeshInstance3D = $Mast
-@onready var hull_mesh: MeshInstance3D = $Hull
 
 # State
 var sail_trim: float = 0.5
@@ -58,7 +57,8 @@ func _physics_process(delta: float) -> void:
 	current_heel = lerp(current_heel, float(sail_force["heel"]), heel_recovery_speed * delta)
 	rotation.z = current_heel
 
-	var boat_forward: Vector3 = -transform.basis.z.normalized()
+	# Use the boat's local +Z as forward, which matches the hull model and camera follow.
+	var boat_forward: Vector3 = transform.basis.z.normalized()
 	var boat_right: Vector3 = transform.basis.x.normalized()
 	var thrust_vector: Vector3 = boat_forward * float(sail_force["drive"]) + boat_right * float(sail_force["drift"])
 

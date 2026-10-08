@@ -15,6 +15,9 @@ func _process(delta: float) -> void:
 	if target == null:
 		return
 
-	var desired_position: Vector3 = target.global_position + Vector3(0, height, 0) - target.global_basis.z * distance
+	# Follow only the boat's horizontal position so the camera doesn't bob with the wave motion.
+	var target_flat_position: Vector3 = target.global_position
+	target_flat_position.y = 0.0
+	var desired_position: Vector3 = target_flat_position + Vector3(0.0, height, 0.0) - target.global_basis.z * distance
 	global_position = global_position.lerp(desired_position, follow_speed * delta)
-	look_at(target.global_position + Vector3(0, 1.5, 0), Vector3.UP)
+	look_at(Vector3(target.global_position.x, target.global_position.y + 1.5, target.global_position.z), Vector3.UP)
