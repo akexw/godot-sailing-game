@@ -1,31 +1,29 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=14 format=3 uid="uid://b7nu4uv211yk1"]
 
-[ext_resource type="Script" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
-[ext_resource type="Script" path="res://scripts/boat.gd" id="2_qqxp0"]
-[ext_resource type="Script" path="res://scripts/camera_controller.gd" id="3_x5jot"]
-[ext_resource type="Script" path="res://scripts/wind_system.gd" id="4_wind"]
-[ext_resource type="Script" path="res://scripts/race_manager.gd" id="5_race"]
-[ext_resource type="Script" path="res://scripts/island_manager.gd" id="6_islands"]
-[ext_resource type="Script" path="res://scripts/ui_hud.gd" id="7_hud"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(2, 0.8, 4)
+[ext_resource type="Script" uid="uid://b4tm8oj3mvmdy" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
+[ext_resource type="Script" uid="uid://dvumvepwbrnf7" path="res://scripts/boat.gd" id="2_qqxp0"]
+[ext_resource type="Script" uid="uid://rd7sopv5b5kx" path="res://scripts/camera_controller.gd" id="3_x5jot"]
+[ext_resource type="Script" uid="uid://0ldhpy2ko7nf" path="res://scripts/wind_system.gd" id="4_wind"]
+[ext_resource type="Script" uid="uid://dy6l57si3ntka" path="res://scripts/race_manager.gd" id="5_race"]
+[ext_resource type="Script" uid="uid://fa8tuw3nxxnt" path="res://scripts/island_manager.gd" id="6_islands"]
+[ext_resource type="Script" uid="uid://dpw4v5thpygae" path="res://scripts/ui_hud.gd" id="7_hud"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.8, 0.35, 0.2, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
-radius = 0.08
-height = 4.0
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(2, 0.8, 4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
 albedo_color = Color(0.5, 0.35, 0.2, 1)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
-size = Vector2(2.5, 3.0)
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+height = 4.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
-albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
+size = Vector2(2.5, 3)
 
 [node name="Main" type="Node3D"]
 
@@ -36,52 +34,34 @@ sky_mode = 1
 
 [node name="Ocean" type="MeshInstance3D" parent="."]
 script = ExtResource("1_qlv2c")
-size = Vector2(200, 200)
-subdivisions = 120
-amplitude = 0.8
-speed = 0.8
-frequency = 1.2
 
 [node name="WindSystem" type="Node3D" parent="."]
 script = ExtResource("4_wind")
 wind_direction = Vector3(1, 0, -0.5)
-wind_strength = 12.0
-wind_gust_speed = 0.3
-wind_gust_scale = 3.0
-unique_name_in_group = true
 
 [node name="Islands" type="Node3D" parent="."]
 script = ExtResource("6_islands")
 
 [node name="RaceManager" type="Node3D" parent="."]
 script = ExtResource("5_race")
-unique_name_in_group = true
 
 [node name="Boat" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 script = ExtResource("2_qqxp0")
-max_speed = 20.0
-acceleration = 8.0
-rudder_turn_speed = 1.8
-water_drag = 0.15
-drift_factor = 0.25
-max_heel_angle = 0.45
-heel_recovery_speed = 1.2
-sail_max_angle = 0.9
 
 [node name="Hull" type="MeshInstance3D" parent="Boat"]
-mesh = SubResource("BoxMesh_1")
 material_override = SubResource("StandardMaterial3D_1")
+mesh = SubResource("BoxMesh_1")
 
 [node name="Mast" type="MeshInstance3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-mesh = SubResource("CylinderMesh_1")
 material_override = SubResource("StandardMaterial3D_2")
+mesh = SubResource("CylinderMesh_1")
 
 [node name="Sail" type="MeshInstance3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-mesh = SubResource("PlaneMesh_1")
 material_override = SubResource("StandardMaterial3D_3")
+mesh = SubResource("PlaneMesh_1")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 8, 12)
@@ -90,4 +70,6 @@ fov = 60.0
 script = ExtResource("3_x5jot")
 
 [node name="HUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("7_hud")

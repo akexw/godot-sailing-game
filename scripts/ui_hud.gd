@@ -21,11 +21,21 @@ func _draw() -> void:
 	var speed: float = boat.boat_velocity.length()
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin), "Speed: %.1f kt" % speed, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 30), "Trim: %.0f%%" % (boat.sail_trim * 100), HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	
+	# display wind speed
+	var wind_speed: float = boat.true_wind.length()
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 180), "Wind speed: %.1f kt" % wind_speed, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	# Use boat's wind direction (true wind) for display
 	var true_wind_dir: Vector3 = boat.wind_direction
 	var true_wind_angle_deg: float = rad_to_deg(atan2(true_wind_dir.x, -true_wind_dir.z))
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 60), "True Wind: %.0f°" % true_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	
+		# Display wind angle relative to heading
+	var wind_dir: Vector3 = boat.wind_direction
+	var wind_ang: float = rad_to_deg(atan2(wind_dir.x, -wind_dir.z))
+	var rel_wind_angle_deg: float = wind_ang - rad_to_deg(boat.current_heading)
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 150), "Rel wind angle: %.0f°" % rel_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	# Calculate apparent wind angle relative to boat
 	var apparent_wind: Vector3 = boat.compute_apparent_wind()
@@ -36,6 +46,12 @@ func _draw() -> void:
 	# Display boat heading
 	var boat_heading_deg: float = rad_to_deg(boat.current_heading)
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 120), "Heading: %.0f°" % boat_heading_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	
+	# wind to heading angle as computed by boat
+	var disp_angle_diff: float = boat.anglediff
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 210), "AD: %.0f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	
+	
 
 	draw_wind_compass(Vector2(screen_size.x - 120, margin + 40))
 
@@ -58,7 +74,7 @@ func draw_wind_compass(center: Vector2) -> void:
 	var boat_heading: float = boat.current_heading
 	
 	# Compass rose angle relative to boat heading (boat always points up)
-	var compass_rotation: float = -boat_heading
+	var compass_rotation: float = boat_heading
 	
 	# Draw compass circle
 	draw_circle(center, radius, Color.DARK_GRAY)
@@ -86,6 +102,6 @@ func draw_wind_compass(center: Vector2) -> void:
 	
 	# Wind arrow rotates with compass (relative to boat heading)
 	var wind_angle_relative: float = true_wind_angle - boat_heading
-	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), -cos(wind_angle_relative)) * (radius - 5)
+	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), cos(wind_angle_relative)) * (radius - 5)
 	draw_line(center, wind_end, Color.LIGHT_BLUE, 3.0)
 	draw_circle(wind_end, 4.0, Color.LIGHT_BLUE)

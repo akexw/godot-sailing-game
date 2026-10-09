@@ -1,6 +1,6 @@
 extends Node3D
 
-@export var wind_direction: Vector3 = Vector3(1.0, 0.0, -0.5).normalized()
+@export var wind_direction: Vector3 = Vector3(1.0, 0.0, 0).normalized()
 @export var wind_strength: float = 12.0
 @export var wind_gust_speed: float = 0.3
 @export var wind_gust_scale: float = 3.0
