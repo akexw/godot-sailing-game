@@ -105,7 +105,7 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	var local_wind: Vector3 = transform.basis.inverse() * apparent_wind
 	var wind_speed: float = local_wind.length()
 	
-	var wind_angle: float = atan2(local_wind.x, -local_wind.z)  
+	var wind_angle: float = atan2(local_wind.x, local_wind.z)  
 	var abs_wind_angle: float = abs(wind_angle)
 	
 	var world_wind_angle: float = atan2(wind_direction.x, wind_direction.z)
