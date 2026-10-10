@@ -48,8 +48,8 @@ func _draw() -> void:
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 120), "Heading: %.0f°" % boat_heading_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 	
 	# wind to heading angle as computed by boat
-	var disp_angle_diff: float = boat.adj_angle
-	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 210), "AD: %.0f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	var disp_angle_diff: float = boat.anglediff
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 210), "AD: %.2f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.BLACK)
 	
 	
 

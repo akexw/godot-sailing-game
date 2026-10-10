@@ -15,7 +15,7 @@ class_name Boat
 @export var wind_gust_scale: float = 3.0
 @export var wind_angle: float = 0
 @export var true_wind: Vector3 = Vector3(0, 0, 0)
-@export var anglediff: int = 1
+@export var anglediff: float = 1
 @export var adj_angle: float = 0
 
 # Sail and heel
@@ -111,44 +111,36 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	anglediff = wind_diff_angle()
 	
 	
-	# need to convert anglediff to a value from 0 to PI depending on how far angle diff is from 0.
-	var sinting: float = cos(anglediff)
-	if sinting > 0:
-		adj_angle = 180 - int(rad_to_deg(anglediff)) % 180
-	if sinting <= 0:
-		adj_angle = int(rad_to_deg(anglediff)) % 180
-		
 	
-	
-	if adj_angle < 45:
+	if anglediff < 0.78:
 		return {"drive": 0.0, "drift": 0.0, "heel": 0.0}
 	
 	var drive: float = 0
 	var lateral: float = 0
 	var heel: float = 0
 	
-	if 45 <= adj_angle and adj_angle < 60:
+	if 0.78 <= anglediff and anglediff < 1:
 		drive = wind_speed * trim * 0.05
 		lateral= sin(anglediff) * wind_speed * 0.05
 		heel = clamp(-lateral * 0.15, -max_heel_angle, max_heel_angle)
 	
-	if 60 <= adj_angle and adj_angle < 80:
+	if 1 <= anglediff and anglediff < 1.4:
 		drive= wind_speed * trim * 0.1
 		lateral= sin(anglediff) * wind_speed * 0.03
 		heel = clamp(-lateral * 0.11, -max_heel_angle, max_heel_angle)
 	
 	
-	if 80 <= adj_angle and adj_angle < 100:
+	if 1.4 <= anglediff and anglediff < 1.7:
 		drive = wind_speed * trim * 0.5
 		lateral = sin(anglediff) * wind_speed * 0.01
 		heel = clamp(-lateral * 0.10, -max_heel_angle, max_heel_angle)
 		
-	if 100 <= adj_angle and adj_angle < 150:
+	if 1.7 <= anglediff and anglediff < 2.6:
 		drive = wind_speed * trim * 0.4
 		lateral = sin(anglediff) * wind_speed * 0.005
 		heel = clamp(-lateral * 0.05, -max_heel_angle, max_heel_angle)
 		
-	if adj_angle >= 150:
+	if anglediff >= 2.6:
 		drive = wind_speed * trim * 0.3
 		lateral = sin(anglediff) * wind_speed * 0.001
 		heel = clamp(-lateral * 0.01, -max_heel_angle, max_heel_angle)
