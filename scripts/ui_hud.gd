@@ -63,9 +63,8 @@ func draw_wind_compass(center: Vector2) -> void:
 	# True wind direction in world space
 	var true_wind_dir: Vector3 = boat.wind_direction
 	var true_wind_angle: float = boat.wind_bearing()
+	var wind_from_angle: float = boat.wind_source_bearing()
 	
-	# Add PI to show where wind comes FROM instead of where it goes TO
-	var wind_from_angle: float = true_wind_angle + PI
 	
 	# Boat heading in world space
 	var boat_heading: float = boat.current_heading
@@ -99,7 +98,7 @@ func draw_wind_compass(center: Vector2) -> void:
 	
 # Wind arrow shows where wind COMES FROM (add PI to direction)
 	# Same convention as the N/E/S/W labels: world bearing + boat heading
-	var wind_angle_relative: float = -wind_from_angle + boat_heading + PI
+	var wind_angle_relative: float = -wind_from_angle + boat_heading
 	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), -cos(wind_angle_relative)) * (radius - 5)
 	draw_line(center, wind_end, Color.LIGHT_BLUE, 3.0)
 	draw_circle(wind_end, 4.0, Color.LIGHT_BLUE)
