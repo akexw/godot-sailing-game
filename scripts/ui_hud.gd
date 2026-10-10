@@ -98,7 +98,8 @@ func draw_wind_compass(center: Vector2) -> void:
 	draw_string(ThemeDB.fallback_font, west_pos, "W", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.GRAY)
 	
 # Wind arrow shows where wind COMES FROM (add PI to direction)
-	var wind_angle_relative: float = -(wind_from_angle - boat_heading)
+	# Same convention as the N/E/S/W labels: world bearing + boat heading
+	var wind_angle_relative: float = wind_from_angle + boat_heading
 	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), -cos(wind_angle_relative)) * (radius - 5)
 	draw_line(center, wind_end, Color.LIGHT_BLUE, 3.0)
 	draw_circle(wind_end, 4.0, Color.LIGHT_BLUE)
