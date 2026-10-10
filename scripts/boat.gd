@@ -150,31 +150,31 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	
 	# close haul
 	if 0.78 <= anglediff and anglediff < 1:
-		drive = wind_speed * trim * 0.1
+		drive = wind_speed * trim * 0.08
 		lateral = sin(signed_diff) * wind_speed * 0.05
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 	
 	# close reach
 	if 1 <= anglediff and anglediff < 1.4:
-		drive= wind_speed * trim * 0.12
+		drive= wind_speed * trim * 0.1
 		lateral = sin(signed_diff) * wind_speed * 0.03
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 	
 	# beam reach
 	if 1.4 <= anglediff and anglediff < 1.7:
-		drive = wind_speed * trim * 0.17
+		drive = wind_speed * trim * 0.16
 		lateral = sin(signed_diff) * wind_speed * 0.015
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 		
 		# broad reach
 	if 1.7 <= anglediff and anglediff < 2.6:
-		drive = wind_speed * trim * 0.15
+		drive = wind_speed * trim * 0.2
 		lateral = sin(signed_diff) * wind_speed * 0.005
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 		
 		# running
 	if anglediff >= 2.6:
-		drive = wind_speed * trim * 0.145
+		drive = wind_speed * trim * 0.2
 		lateral = sin(signed_diff) * wind_speed * 0.001
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 		
