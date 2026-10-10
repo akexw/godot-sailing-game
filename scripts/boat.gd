@@ -1,13 +1,14 @@
 extends CharacterBody3D
 class_name Boat
 
+
 # Physics parameters
 @export_range(0.0, 30.0) var max_speed: float = 20.0
 @export_range(0.0, 20.0) var acceleration: float = 2.5
 @export_range(0.0, 4.0) var rudder_turn_speed: float = 0.4
-@export_range(0.0, 1.0) var water_drag: float = 0.2
+@export_range(0.0, 20.0) var water_drag_rate: float = 0.2  # Changed from 0-1 to 0-20 for per-second damping
 @export_range(0.0, 1.0) var drift_factor: float = 0.05
-@export_range(0.0, 10.0) var keel_grip: float = 4.0  # higher = less sideways slip
+@export_range(0.0, 10.0) var keel_grip: float = 4.0
 
 # Wind system
 @export var wind_direction: Vector3 = Vector3(0.0, 0.0, 1.0).normalized()
@@ -48,7 +49,8 @@ func _ready() -> void:
 		mast_mesh.position = Vector3(0.0, 1.0, 0.0)
 	if sail_mesh:
 		sail_mesh.position = Vector3(0.0, 1.5, 0.0)
-
+	
+	
 func _physics_process(delta: float) -> void:
 	var turn_input: float = input_axis("turn_left", "turn_right")
 	var trim_input: float = input_axis("move_forward", "move_backward")
@@ -69,27 +71,35 @@ func _physics_process(delta: float) -> void:
 	var boat_right: Vector3 = transform.basis.x.normalized()
 	var thrust_vector: Vector3 = boat_forward * float(sail_force["drive"]) + boat_right * float(sail_force["drift"])
 
-	var desired_velocity: Vector3 = boat_velocity + thrust_vector * acceleration * delta
-	boat_velocity = boat_velocity.lerp(desired_velocity, 1.0 - water_drag)
-	boat_velocity = boat_velocity.lerp(Vector3.ZERO, water_drag * delta)
-	
-		# Use the flat heading, so heel doesn't tilt the axes
+	# 1. Sail force accelerates boat (frame-rate independent via delta).
+	boat_velocity += thrust_vector * acceleration * delta
+
+	# 2. Keel cancels unwanted sideways slip.
+	# Use the flat heading, so heel doesn't tilt the axes
 	var fwd: Vector3 = Vector3(sin(current_heading), 0.0, cos(current_heading))
 	var right: Vector3 = Vector3(cos(current_heading), 0.0, -sin(current_heading))
-	
+
 	var forward_speed: float = boat_velocity.dot(fwd)
 	var side_speed: float = boat_velocity.dot(right)
+
+	# Optional: Speed loss in sharp turns
 	forward_speed *= 1.0 - abs(rudder_angle) * 0.15 * delta
+
+	# Keel effectiveness decreases at low speed (needs flow to work)
 	var grip: float = keel_grip * clamp(abs(forward_speed) / 3.0, 0.2, 1.0)
-	
-	# The keel resists sideways motion much more than forward motion
-	side_speed = lerp(side_speed, 0.0, 1.0 - exp(-grip * delta))
+	side_speed *= exp(-grip * delta)
+
 	boat_velocity = fwd * forward_speed + right * side_speed
-	
+
+	# 3. Hull/water drag slows all motion gradually (frame-rate independent).
+	boat_velocity *= exp(-water_drag_rate * delta)
+
+	# 4. Enforce max speed.
 	if boat_velocity.length() > max_speed:
 		boat_velocity = boat_velocity.normalized() * max_speed
 
 	position += boat_velocity * delta
+
 
 	if sail_mesh:
 		var sail_rotation: float = lerp(-sail_max_angle, sail_max_angle, sail_trim)
@@ -109,11 +119,6 @@ func compute_apparent_wind() -> Vector3:
 	true_wind *= 1.0 + gust * 0.1
 	return true_wind - boat_velocity
 
-#the difference in angle between true wind and the boats heading
-'func wind_diff_angle() -> float:
-	add_to_group("boat")
-	var find_anglediff: float = abs(atan2(wind_direction.x, wind_direction.z) - rotation.y)
-	return find_anglediff'
 
 # Bearing the wind blows TOWARD, same convention as rotation.y (forward = +Z)
 func wind_bearing() -> float:
