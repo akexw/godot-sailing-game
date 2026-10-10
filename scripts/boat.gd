@@ -15,7 +15,8 @@ class_name Boat
 @export var wind_gust_scale: float = 3.0
 @export var wind_angle: float = 0
 @export var true_wind: Vector3 = Vector3(0, 0, 0)
-@export var anglediff: float = 1.8
+@export var anglediff: int = 1
+@export var adj_angle: float = 0
 
 # Sail and heel
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
@@ -96,7 +97,8 @@ func compute_apparent_wind() -> Vector3:
 
 #the difference in angle between true wind and the boats heading
 func wind_diff_angle() -> float:
-	var find_anglediff: float = abs(atan2(-true_wind.z, true_wind.x) - atan2(-boat_velocity.z, boat_velocity.x))
+	add_to_group("boat")
+	var find_anglediff: float = abs(atan2(wind_direction.z, wind_direction.x) - rotation.y)
 	return find_anglediff
 
 func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
@@ -108,37 +110,47 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	
 	anglediff = wind_diff_angle()
 	
-	if anglediff < 0.78:
+	
+	# need to convert anglediff to a value from 0 to PI depending on how far angle diff is from 0.
+	var sinting: float = cos(anglediff)
+	if sinting > 0:
+		adj_angle = 180 - int(rad_to_deg(anglediff)) % 180
+	if sinting <= 0:
+		adj_angle = int(rad_to_deg(anglediff)) % 180
+		
+	
+	
+	if adj_angle < 45:
 		return {"drive": 0.0, "drift": 0.0, "heel": 0.0}
 	
 	var drive: float = 0
 	var lateral: float = 0
 	var heel: float = 0
 	
-	if 0.78 <= anglediff and anglediff < 1:
-		drive = wind_speed * trim * 0.1
-		lateral= sin(wind_angle) * wind_speed * 0.05
+	if 45 <= adj_angle and adj_angle < 60:
+		drive = wind_speed * trim * 0.05
+		lateral= sin(anglediff) * wind_speed * 0.05
 		heel = clamp(-lateral * 0.15, -max_heel_angle, max_heel_angle)
 	
-	if 1 <= anglediff and anglediff < 1.4:
-		drive= wind_speed * trim * 0.3
-		lateral= sin(wind_angle) * wind_speed * 0.03
+	if 60 <= adj_angle and adj_angle < 80:
+		drive= wind_speed * trim * 0.1
+		lateral= sin(anglediff) * wind_speed * 0.03
 		heel = clamp(-lateral * 0.11, -max_heel_angle, max_heel_angle)
 	
 	
-	if 1.4 <= anglediff and anglediff < 1.7:
-		drive = wind_speed * trim * 0.9
-		lateral = sin(wind_angle) * wind_speed * 0.01
+	if 80 <= adj_angle and adj_angle < 100:
+		drive = wind_speed * trim * 0.5
+		lateral = sin(anglediff) * wind_speed * 0.01
 		heel = clamp(-lateral * 0.10, -max_heel_angle, max_heel_angle)
 		
-	if 1.7 <= anglediff and anglediff < 2.6:
-		drive = wind_speed * trim * 0.7
-		lateral = sin(wind_angle) * wind_speed * 0.005
+	if 100 <= adj_angle and adj_angle < 150:
+		drive = wind_speed * trim * 0.4
+		lateral = sin(anglediff) * wind_speed * 0.005
 		heel = clamp(-lateral * 0.05, -max_heel_angle, max_heel_angle)
 		
-	if anglediff >= 2.6:
-		drive = wind_speed * trim * 0.6
-		lateral = sin(wind_angle) * wind_speed * 0.001
+	if adj_angle >= 150:
+		drive = wind_speed * trim * 0.3
+		lateral = sin(anglediff) * wind_speed * 0.001
 		heel = clamp(-lateral * 0.01, -max_heel_angle, max_heel_angle)
 		
 	'# Graduated head-to-wind penalty: stronger penalty as boat points closer to wind
