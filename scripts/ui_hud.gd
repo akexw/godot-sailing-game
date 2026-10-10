@@ -28,15 +28,9 @@ func _draw() -> void:
 
 	# Use boat's wind direction (true wind) for display
 	var true_wind_dir: Vector3 = boat.wind_direction
-	var true_wind_angle_deg: float = rad_to_deg(atan2(true_wind_dir.x, -true_wind_dir.z))
+	var true_wind_angle_deg: float = rad_to_deg(atan2(true_wind_dir.x, true_wind_dir.z))
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 60), "True Wind: %.0f°" % true_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 	
-		# Display wind angle relative to heading
-	var wind_dir: Vector3 = boat.wind_direction
-	var wind_ang: float = rad_to_deg(atan2(wind_dir.x, -wind_dir.z))
-	var rel_wind_angle_deg: float = wind_ang - rad_to_deg(boat.current_heading)
-	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 150), "Rel wind angle: %.0f°" % rel_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
-
 	# Calculate apparent wind angle relative to boat
 	var apparent_wind: Vector3 = boat.compute_apparent_wind()
 	var local_apparent_wind: Vector3 = boat.transform.basis.inverse() * apparent_wind
@@ -68,7 +62,10 @@ func draw_wind_compass(center: Vector2) -> void:
 	
 	# True wind direction in world space
 	var true_wind_dir: Vector3 = boat.wind_direction
-	var true_wind_angle: float = atan2(true_wind_dir.x, -true_wind_dir.z)
+	var true_wind_angle: float = atan2(true_wind_dir.x, true_wind_dir.z)
+	
+	# Add PI to show where wind comes FROM instead of where it goes TO
+	var wind_from_angle: float = true_wind_angle + PI
 	
 	# Boat heading in world space
 	var boat_heading: float = boat.current_heading
@@ -100,8 +97,8 @@ func draw_wind_compass(center: Vector2) -> void:
 	draw_string(ThemeDB.fallback_font, south_pos, "S", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.GRAY)
 	draw_string(ThemeDB.fallback_font, west_pos, "W", HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.GRAY)
 	
-	# Wind arrow rotates with compass (relative to boat heading)
-	var wind_angle_relative: float = true_wind_angle - boat_heading
-	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), cos(wind_angle_relative)) * (radius - 5)
+# Wind arrow shows where wind COMES FROM (add PI to direction)
+	var wind_angle_relative: float = -(wind_from_angle - boat_heading)
+	var wind_end: Vector2 = center + Vector2(sin(wind_angle_relative), -cos(wind_angle_relative)) * (radius - 5)
 	draw_line(center, wind_end, Color.LIGHT_BLUE, 3.0)
 	draw_circle(wind_end, 4.0, Color.LIGHT_BLUE)
