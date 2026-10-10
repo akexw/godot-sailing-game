@@ -34,7 +34,7 @@ func _draw() -> void:
 	# Calculate apparent wind angle relative to boat
 	var apparent_wind: Vector3 = boat.compute_apparent_wind()
 	var local_apparent_wind: Vector3 = boat.transform.basis.inverse() * apparent_wind
-	var apparent_wind_angle_deg: float = rad_to_deg(atan2(local_apparent_wind.x, -local_apparent_wind.z))
+	var apparent_wind_angle_deg: float = rad_to_deg(atan2(local_apparent_wind.x, local_apparent_wind.z))
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 90), "App Wind: %.0f°" % apparent_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	# Display boat heading
