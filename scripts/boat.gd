@@ -7,6 +7,7 @@ class_name Boat
 @export_range(0.0, 4.0) var rudder_turn_speed: float = 0.4
 @export_range(0.0, 1.0) var water_drag: float = 0.2
 @export_range(0.0, 1.0) var drift_factor: float = 0.05
+@export_range(0.0, 10.0) var keel_grip: float = 4.0  # higher = less sideways slip
 
 # Wind system
 @export var wind_direction: Vector3 = Vector3(0.0, 0.0, 1.0).normalized()
@@ -71,7 +72,20 @@ func _physics_process(delta: float) -> void:
 	var desired_velocity: Vector3 = boat_velocity + thrust_vector * acceleration * delta
 	boat_velocity = boat_velocity.lerp(desired_velocity, 1.0 - water_drag)
 	boat_velocity = boat_velocity.lerp(Vector3.ZERO, water_drag * delta)
-
+	
+		# Use the flat heading, so heel doesn't tilt the axes
+	var fwd: Vector3 = Vector3(sin(current_heading), 0.0, cos(current_heading))
+	var right: Vector3 = Vector3(cos(current_heading), 0.0, -sin(current_heading))
+	
+	var forward_speed: float = boat_velocity.dot(fwd)
+	var side_speed: float = boat_velocity.dot(right)
+	forward_speed *= 1.0 - abs(rudder_angle) * 0.15 * delta
+	var grip: float = keel_grip * clamp(abs(forward_speed) / 3.0, 0.2, 1.0)
+	
+	# The keel resists sideways motion much more than forward motion
+	side_speed = lerp(side_speed, 0.0, 1.0 - exp(-grip * delta))
+	boat_velocity = fwd * forward_speed + right * side_speed
+	
 	if boat_velocity.length() > max_speed:
 		boat_velocity = boat_velocity.normalized() * max_speed
 
@@ -159,19 +173,6 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 		lateral = sin(signed_diff) * wind_speed * 0.001
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 		
-	'# Graduated head-to-wind penalty: stronger penalty as boat points closer to wind
-	var abs_wind_angle: float = abs(wind_angle)
-	var head_to_wind_penalty: float = 0
-	if abs_wind_angle < head_to_wind_zone:
-		# Smooth penalty curve: pow(1 - angle/zone, strength) creates stronger penalty close to wind
-		var normalized_angle: float = abs_wind_angle / head_to_wind_zone
-		head_to_wind_penalty = pow(1.0 - normalized_angle, head_to_wind_penalty_strength)
-	
-	var sail_angle: float = lerp(0.3, 0.05, trim)
-	var angle_factor: float = max(0.0, cos(wind_angle - sail_angle))
-	var drive: float = angle_factor * wind_speed * trim * 0.5 * (1.0 - head_to_wind_penalty)
-	var lateral: float = sin(wind_angle) * wind_speed * (1.0 - abs(sail_angle)) * 0.6
-	var heel: float = clamp(-lateral * 0.15, -max_heel_angle, max_heel_angle)'
 
 	return {
 		"drive": drive,

@@ -24,7 +24,7 @@ func _draw() -> void:
 	
 	# display wind speed
 	var wind_speed: float = boat.true_wind.length()
-	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 180), "Wind speed: %.1f kt" % wind_speed, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 150), "Wind speed: %.1f kt" % wind_speed, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	# Use boat's wind direction (true wind) for display
 	var true_wind_dir: Vector3 = boat.wind_direction
@@ -36,14 +36,10 @@ func _draw() -> void:
 	var local_apparent_wind: Vector3 = boat.transform.basis.inverse() * apparent_wind
 	var apparent_wind_angle_deg: float = rad_to_deg(atan2(local_apparent_wind.x, local_apparent_wind.z))
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 90), "App Wind: %.0f°" % apparent_wind_angle_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
-
-	# Display boat heading
-	var boat_heading_deg: float = rad_to_deg(boat.current_heading)
-	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 120), "Heading: %.0f°" % boat_heading_deg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 	
 	# wind to heading angle as computed by boat
 	var disp_angle_diff: float = boat.anglediff
-	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 210), "AD: %.2f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.BLACK)
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 120), "AD: %.2f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.BLACK)
 	
 	
 
