@@ -3,10 +3,10 @@ class_name Boat
 
 # Physics parameters
 @export_range(0.0, 30.0) var max_speed: float = 20.0
-@export_range(0.0, 20.0) var acceleration: float = 3.0
-@export_range(0.0, 4.0) var rudder_turn_speed: float = 1.0
+@export_range(0.0, 20.0) var acceleration: float = 2.5
+@export_range(0.0, 4.0) var rudder_turn_speed: float = 0.8
 @export_range(0.0, 1.0) var water_drag: float = 0.15
-@export_range(0.0, 1.0) var drift_factor: float = 0.25
+@export_range(0.0, 1.0) var drift_factor: float = 0.1
 
 # Wind system
 @export var wind_direction: Vector3 = Vector3(1.0, 0.0, -0.5).normalized()
@@ -108,7 +108,9 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	var wind_angle: float = atan2(local_wind.x, -local_wind.z)     
 	var abs_wind_angle: float = abs(wind_angle)
 	
-	anglediff = wind_diff_angle()
+	anglediff = abs(angle_difference(current_heading, atan2(wind_direction.x, -wind_direction.z)))
+	
+	# anglediff = wind_diff_angle()
 	
 	
 	
@@ -120,28 +122,28 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	var heel: float = 0
 	
 	if 0.78 <= anglediff and anglediff < 1:
-		drive = wind_speed * trim * 0.05
+		drive = wind_speed * trim * 0.08
 		lateral= sin(anglediff) * wind_speed * 0.05
 		heel = clamp(-lateral * 0.15, -max_heel_angle, max_heel_angle)
 	
 	if 1 <= anglediff and anglediff < 1.4:
-		drive= wind_speed * trim * 0.1
+		drive= wind_speed * trim * 0.115
 		lateral= sin(anglediff) * wind_speed * 0.03
 		heel = clamp(-lateral * 0.11, -max_heel_angle, max_heel_angle)
 	
 	
 	if 1.4 <= anglediff and anglediff < 1.7:
-		drive = wind_speed * trim * 0.5
+		drive = wind_speed * trim * 0.14
 		lateral = sin(anglediff) * wind_speed * 0.01
 		heel = clamp(-lateral * 0.10, -max_heel_angle, max_heel_angle)
 		
 	if 1.7 <= anglediff and anglediff < 2.6:
-		drive = wind_speed * trim * 0.4
+		drive = wind_speed * trim * 0.13
 		lateral = sin(anglediff) * wind_speed * 0.005
 		heel = clamp(-lateral * 0.05, -max_heel_angle, max_heel_angle)
 		
 	if anglediff >= 2.6:
-		drive = wind_speed * trim * 0.3
+		drive = wind_speed * trim * 0.125
 		lateral = sin(anglediff) * wind_speed * 0.001
 		heel = clamp(-lateral * 0.01, -max_heel_angle, max_heel_angle)
 		
