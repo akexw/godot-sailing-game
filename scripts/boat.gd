@@ -16,7 +16,7 @@ class_name Boat
 @export var wind_angle: float = 0
 @export var true_wind: Vector3 = Vector3(0, 0, 0)
 @export var anglediff: float = 1
-@export var adj_angle: float = 0
+
 
 # Sail and heel
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
@@ -98,7 +98,7 @@ func compute_apparent_wind() -> Vector3:
 #the difference in angle between true wind and the boats heading
 func wind_diff_angle() -> float:
 	add_to_group("boat")
-	var find_anglediff: float = abs(atan2(wind_direction.z, wind_direction.x) - rotation.y)
+	var find_anglediff: float = abs(atan2(wind_direction.x, -wind_direction.z) - rotation.y)
 	return find_anglediff
 
 func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
