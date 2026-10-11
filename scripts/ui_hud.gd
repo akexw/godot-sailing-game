@@ -41,7 +41,8 @@ func _draw() -> void:
 	var disp_angle_diff: float = boat.anglediff
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 120), "AD: %.2f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.BLACK)
 	
-	
+	#show apparent wind strength
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 180), "apparent wind strength: %.1f kt" % boat.apparent_display, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	draw_wind_compass(Vector2(screen_size.x - 120, margin + 40))
 
