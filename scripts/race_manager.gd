@@ -31,13 +31,14 @@ func _process(delta: float) -> void:
 				current_waypoint = 0
 				lap_time = 0.0
 
-func get_distance_to_waypoint(position: Vector3) -> float:
+func get_distance_to_waypoint(target_position: Vector3) -> float:
 	if current_waypoint < waypoints.size():
-		return position.distance_to(waypoints[current_waypoint])
+		return target_position.distance_to(waypoints[current_waypoint])
 	return 0.0
 
-func get_waypoint_heading(position: Vector3) -> float:
+
+func get_waypoint_heading(target_position: Vector3) -> float:
 	if current_waypoint < waypoints.size():
-		var direction: Vector3 = waypoints[current_waypoint] - position
+		var direction: Vector3 = waypoints[current_waypoint] - target_position
 		return rad_to_deg(atan2(direction.x, -direction.z))
 	return 0.0
