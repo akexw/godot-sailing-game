@@ -98,8 +98,8 @@ func _physics_process(delta: float) -> void:
 	if boat_velocity.length() > max_speed:
 		boat_velocity = boat_velocity.normalized() * max_speed
 
-	position += boat_velocity * delta
-
+	velocity = boat_velocity
+	move_and_slide()
 
 	if sail_mesh:
 		var sail_rotation: float = lerp(-sail_max_angle, sail_max_angle, sail_trim)
