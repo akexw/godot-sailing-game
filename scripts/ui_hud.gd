@@ -58,8 +58,6 @@ func draw_wind_compass(center: Vector2) -> void:
 	var radius: float = 30.0
 	
 	# True wind direction in world space
-	"var true_wind_dir: Vector3 = boat.wind_direction"
-	"var true_wind_angle: float = boat.wind_bearing()"
 	var wind_from_angle: float = boat.wind_source_bearing()
 	
 	

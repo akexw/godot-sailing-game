@@ -26,15 +26,25 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	lap_time += delta
-	var distance_to_waypoint: float = boat.global_position.distance_to(waypoints[current_waypoint])
-	if distance_to_waypoint < waypoint_radius:
-		current_waypoint += 1
-		_update_waypoint_buoy()
-		if current_waypoint >= waypoints.size():
-			print("Lap complete! Time: %.1f seconds" % lap_time)
-			current_waypoint = 0
-			lap_time = 0.0
+
+	if boat == null:
+		boat = get_tree().get_first_node_in_group("boat")
+
+	if boat == null:
+		return
+
+	if current_waypoint < waypoints.size():
+		var distance_to_waypoint: float = boat.global_position.distance_to(waypoints[current_waypoint])
+		if distance_to_waypoint < waypoint_radius:
+			current_waypoint += 1
 			_update_waypoint_buoy()
+			if current_waypoint >= waypoints.size():
+				print("Lap complete! Time: %.1f seconds" % lap_time)
+				current_waypoint = 0
+				lap_time = 0.0
+				_update_waypoint_buoy()
+
+
 func _create_waypoint_buoy() -> void:
 	waypoint_buoy = MeshInstance3D.new()
 	var buoy_mesh: CylinderMesh = CylinderMesh.new()
@@ -67,34 +77,3 @@ func get_waypoint_heading(target_position: Vector3) -> float:
 		var direction: Vector3 = waypoints[current_waypoint] - target_position
 		return rad_to_deg(atan2(direction.x, -direction.z))
 	return 0.0
-
-'
-func _ready() -> void:
-	boat = get_tree().get_first_node_in_group("boat")
-	if waypoints.is_empty():
-		push_warning("No waypoints defined for race")
-
-func _process(delta: float) -> void:
-	lap_time += delta
-
-	if boat and current_waypoint < waypoints.size():
-		var distance_to_waypoint: float = boat.global_position.distance_to(waypoints[current_waypoint])
-		if distance_to_waypoint < waypoint_radius:
-			current_waypoint += 1
-			if current_waypoint >= waypoints.size():
-				print("Lap complete! Time: %.1f seconds" % lap_time)
-				current_waypoint = 0
-				lap_time = 0.0
-
-func get_distance_to_waypoint(target_position: Vector3) -> float:
-	if current_waypoint < waypoints.size():
-		return target_position.distance_to(waypoints[current_waypoint])
-	return 0.0
-
-
-func get_waypoint_heading(target_position: Vector3) -> float:
-	if current_waypoint < waypoints.size():
-		var direction: Vector3 = waypoints[current_waypoint] - target_position
-		return rad_to_deg(atan2(direction.x, -direction.z))
-	return 0.0
-	' 
