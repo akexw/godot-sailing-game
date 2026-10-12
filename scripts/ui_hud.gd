@@ -41,7 +41,8 @@ func _draw() -> void:
 	var disp_angle_diff: float = boat.anglediff
 	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 120), "AD: %.2f radd" % disp_angle_diff, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.BLACK)
 	
-	
+	#show apparent wind strength
+	draw_string(ThemeDB.fallback_font, Vector2(margin, margin + 180), "apparent wind strength: %.1f kt" % boat.apparent_display, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 	draw_wind_compass(Vector2(screen_size.x - 120, margin + 40))
 
@@ -57,8 +58,6 @@ func draw_wind_compass(center: Vector2) -> void:
 	var radius: float = 30.0
 	
 	# True wind direction in world space
-	var true_wind_dir: Vector3 = boat.wind_direction
-	var true_wind_angle: float = boat.wind_bearing()
 	var wind_from_angle: float = boat.wind_source_bearing()
 	
 	

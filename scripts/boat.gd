@@ -4,7 +4,7 @@ class_name Boat
 
 # Physics parameters
 @export_range(0.0, 30.0) var max_speed: float = 20.0
-@export_range(0.0, 20.0) var acceleration: float = 2.5
+@export_range(0.0, 20.0) var acceleration: float = 1.5
 @export_range(0.0, 4.0) var rudder_turn_speed: float = 0.4
 @export_range(0.0, 20.0) var water_drag_rate: float = 0.2  # Changed from 0-1 to 0-20 for per-second damping
 @export_range(0.0, 1.0) var drift_factor: float = 0.05
@@ -18,7 +18,7 @@ class_name Boat
 @export var wind_angle: float = 0
 @export var true_wind: Vector3 = Vector3(0, 0, 0)
 @export var anglediff: float = 1
-
+@export var apparent_display: float = 0
 
 # Sail and heel
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
@@ -90,7 +90,7 @@ func _physics_process(delta: float) -> void:
 	side_speed *= exp(-grip * delta)
 
 	boat_velocity = fwd * forward_speed + right * side_speed
-
+	
 	# 3. Hull/water drag slows all motion gradually (frame-rate independent).
 	boat_velocity *= exp(-water_drag_rate * delta)
 
@@ -117,6 +117,9 @@ func compute_apparent_wind() -> Vector3:
 	true_wind = wind_direction.normalized() * wind_strength
 	var gust: float = sin(Time.get_ticks_msec() * 0.001 * wind_gust_speed) * wind_gust_scale
 	true_wind *= 1.0 + gust * 0.1
+	
+	apparent_display = (true_wind - boat_velocity).length()
+	
 	return true_wind - boat_velocity
 
 
@@ -132,11 +135,10 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	var local_wind: Vector3 = transform.basis.inverse() * apparent_wind
 	var wind_speed: float = local_wind.length()
 	
-	var wind_angle: float = atan2(local_wind.x, local_wind.z)  
-	var abs_wind_angle: float = abs(wind_angle)
+	wind_angle = atan2(local_wind.x, local_wind.z)  
 	
 	var signed_diff: float = angle_difference(current_heading, wind_source_bearing())
-	var side: float = sign(signed_diff)
+	'var side: float = sign(signed_diff)'
 	
 	anglediff = abs(signed_diff)
 	
@@ -162,19 +164,19 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	
 	# beam reach
 	if 1.4 <= anglediff and anglediff < 1.7:
-		drive = wind_speed * trim * 0.16
+		drive = wind_speed * trim * 0.23
 		lateral = sin(signed_diff) * wind_speed * 0.015
-		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
+		heel = clamp(lateral * 0.5, -max_heel_angle, max_heel_angle)
 		
 		# broad reach
 	if 1.7 <= anglediff and anglediff < 2.6:
-		drive = wind_speed * trim * 0.2
+		drive = wind_speed * trim * 0.35
 		lateral = sin(signed_diff) * wind_speed * 0.005
-		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
+		heel = clamp(lateral * 0.6, -max_heel_angle, max_heel_angle)
 		
 		# running
 	if anglediff >= 2.6:
-		drive = wind_speed * trim * 0.2
+		drive = wind_speed * trim * 0.7
 		lateral = sin(signed_diff) * wind_speed * 0.001
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 		

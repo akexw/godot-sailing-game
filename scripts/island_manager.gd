@@ -6,7 +6,7 @@ func _ready() -> void:
 	_create_island(Vector3(-100, 0, 80), 30.0)
 	_create_island(Vector3(120, 0, 120), 20.0)
 
-func _create_island(position: Vector3, radius: float) -> void:
+func _create_island(island_position: Vector3, radius: float) -> void:
 	var island: MeshInstance3D = MeshInstance3D.new()
 	var sphere_mesh: SphereMesh = SphereMesh.new()
 	sphere_mesh.radius = radius * 0.5
@@ -18,7 +18,7 @@ func _create_island(position: Vector3, radius: float) -> void:
 	material.roughness = 0.8
 	island.set_surface_override_material(0, material)
 
-	island.position = position + Vector3(0, radius * -0.25, 0)
+	island.position = island_position + Vector3(0, radius * -0.25, 0)
 	add_child(island)
 
 	var collision: StaticBody3D = StaticBody3D.new()
@@ -27,5 +27,5 @@ func _create_island(position: Vector3, radius: float) -> void:
 	sphere_shape.radius = radius * 0.5
 	collision_shape.shape = sphere_shape
 	collision.add_child(collision_shape)
-	collision.position = position + Vector3(0, radius * -0.25, 0)
+	collision.position = island_position + Vector3(0, radius * -0.25, 0)
 	add_child(collision)

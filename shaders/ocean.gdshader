@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode diffuse_lit, specular_smooth;
+render_mode diffuse_lambert, specular_schlick_ggx;
 
 uniform vec4 albedo_color : source_color = vec4(0.12, 0.44, 0.82, 1.0);
 uniform float amplitude = 0.8;
