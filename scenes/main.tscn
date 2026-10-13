@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://b7nu4uv211yk1"]
+[gd_scene load_steps=15 format=3 uid="uid://b7nu4uv211yk1"]
 
 [ext_resource type="Script" uid="uid://b4tm8oj3mvmdy" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
 [ext_resource type="Script" uid="uid://dvumvepwbrnf7" path="res://scripts/boat.gd" id="2_qqxp0"]
@@ -8,11 +8,11 @@
 [ext_resource type="Script" uid="uid://fa8tuw3nxxnt" path="res://scripts/island_manager.gd" id="6_islands"]
 [ext_resource type="Script" uid="uid://dpw4v5thpygae" path="res://scripts/ui_hud.gd" id="7_hud"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-albedo_color = Color(0.8, 0.35, 0.2, 1)
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(2, 0.8, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.8, 0.35, 0.2, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(2, 0.8, 4)

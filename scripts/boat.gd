@@ -5,8 +5,8 @@ class_name Boat
 # Physics parameters
 @export_range(0.0, 30.0) var max_speed: float = 20.0
 @export_range(0.0, 20.0) var acceleration: float = 1.5
-@export_range(0.0, 4.0) var rudder_turn_speed: float = 0.4
-@export_range(0.0, 20.0) var water_drag_rate: float = 0.2  # Changed from 0-1 to 0-20 for per-second damping
+@export_range(0.0, 4.0) var rudder_turn_speed: float = 0.1
+@export_range(0.0, 20.0) var water_drag_rate: float = 0.01  # Changed from 0-1 to 0-20 for per-second damping
 @export_range(0.0, 1.0) var drift_factor: float = 0.05
 @export_range(0.0, 10.0) var keel_grip: float = 4.0
 
@@ -22,7 +22,7 @@ class_name Boat
 
 # Sail and heel
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
-@export_range(0.0, 2.0) var heel_recovery_speed: float = 1.2
+@export_range(0.0, 2.0) var heel_recovery_speed: float = 0.7
 @export var sail_max_angle: float = 0.9
 @export_range(0.0, 1.57) var head_to_wind_zone: float = 0.78  # ~45 degrees in radians
 @export_range(1.0, 10.0) var head_to_wind_penalty_strength: float = 10.0
@@ -57,7 +57,14 @@ func _physics_process(delta: float) -> void:
 
 	sail_trim = clamp(sail_trim + trim_input * 1.2 * delta, 0.0, 1.0)
 	rudder_angle = lerp(rudder_angle, -turn_input, 0.15)
-	current_heading += rudder_angle * rudder_turn_speed * delta
+	
+	#old heading
+	var velocity_turn_speed = rudder_turn_speed * log(boat_velocity.length()+0.2) + 0.15
+	current_heading += rudder_angle * velocity_turn_speed * delta
+	
+	#new heading formula
+	#current_heading += rudder_angle * rudder_turn_speed * delta * log(boat_velocity.length()) + 0.1
+	
 	rotation.y = current_heading
 
 	var apparent_wind: Vector3 = compute_apparent_wind()
@@ -92,7 +99,7 @@ func _physics_process(delta: float) -> void:
 	boat_velocity = fwd * forward_speed + right * side_speed
 	
 	# 3. Hull/water drag slows all motion gradually (frame-rate independent).
-	boat_velocity *= exp(-water_drag_rate * delta)
+	boat_velocity *= exp(-water_drag_rate * boat_velocity.length() * delta - 0.001)
 
 	# 4. Enforce max speed.
 	if boat_velocity.length() > max_speed:
@@ -152,13 +159,13 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	
 	# close haul
 	if 0.78 <= anglediff and anglediff < 1:
-		drive = wind_speed * trim * 0.08
+		drive = wind_speed * trim * 0.06
 		lateral = sin(signed_diff) * wind_speed * 0.05
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 	
 	# close reach
 	if 1 <= anglediff and anglediff < 1.4:
-		drive= wind_speed * trim * 0.1
+		drive= wind_speed * trim * 0.08
 		lateral = sin(signed_diff) * wind_speed * 0.03
 		heel = clamp(lateral * 0.4, -max_heel_angle, max_heel_angle)
 	
@@ -166,13 +173,13 @@ func compute_sail_force(apparent_wind: Vector3, trim: float) -> Dictionary:
 	if 1.4 <= anglediff and anglediff < 1.7:
 		drive = wind_speed * trim * 0.23
 		lateral = sin(signed_diff) * wind_speed * 0.015
-		heel = clamp(lateral * 0.5, -max_heel_angle, max_heel_angle)
+		heel = clamp(lateral * 0.65, -max_heel_angle, max_heel_angle)
 		
 		# broad reach
 	if 1.7 <= anglediff and anglediff < 2.6:
 		drive = wind_speed * trim * 0.35
 		lateral = sin(signed_diff) * wind_speed * 0.005
-		heel = clamp(lateral * 0.6, -max_heel_angle, max_heel_angle)
+		heel = clamp(lateral * 0.9, -max_heel_angle, max_heel_angle)
 		
 		# running
 	if anglediff >= 2.6:
