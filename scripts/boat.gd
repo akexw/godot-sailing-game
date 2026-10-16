@@ -4,13 +4,13 @@ class_name Boat
 
 # Physics parameters
 @export_range(0.0, 30.0) var max_speed: float = 20.0
-@export_range(0.0, 20.0) var acceleration: float = 1.5
-@export_range(0.0, 4.0) var rudder_turn_speed: float = 0.1
+@export_range(0.0, 20.0) var acceleration: float = 0.5
+@export_range(0.0, 4.0) var rudder_turn_speed: float = 0.04
 @export_range(0.0, 20.0) var water_drag_rate: float = 0.01  # Changed from 0-1 to 0-20 for per-second damping
 @export_range(0.0, 1.0) var drift_factor: float = 0.05
 @export_range(0.0, 10.0) var keel_grip: float = 4.0
 
-# Wind system
+# Wind systemaaaaa
 @export var wind_direction: Vector3 = Vector3(0.0, 0.0, 1.0).normalized()
 @export var wind_strength: float = 12.0
 @export var wind_gust_speed: float = 0.3
@@ -22,7 +22,7 @@ class_name Boat
 
 # Sail and heel
 @export_range(0.0, 1.0) var max_heel_angle: float = 0.45
-@export_range(0.0, 2.0) var heel_recovery_speed: float = 0.7
+@export_range(0.0, 2.0) var heel_recovery_speed: float = 0.4
 @export var sail_max_angle: float = 0.9
 @export_range(0.0, 1.57) var head_to_wind_zone: float = 0.78  # ~45 degrees in radians
 @export_range(1.0, 10.0) var head_to_wind_penalty_strength: float = 10.0
@@ -59,7 +59,7 @@ func _physics_process(delta: float) -> void:
 	rudder_angle = lerp(rudder_angle, -turn_input, 0.15)
 	
 	#old heading
-	var velocity_turn_speed = rudder_turn_speed * log(boat_velocity.length()+0.2) + 0.15
+	var velocity_turn_speed = rudder_turn_speed * log(boat_velocity.length()+0.2) + 0.05
 	current_heading += rudder_angle * velocity_turn_speed * delta
 	
 	#new heading formula

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://b7nu4uv211yk1"]
+[gd_scene load_steps=16 format=3 uid="uid://b7nu4uv211yk1"]
 
 [ext_resource type="Script" uid="uid://b4tm8oj3mvmdy" path="res://scripts/ocean_mesh.gd" id="1_qlv2c"]
 [ext_resource type="Script" uid="uid://dvumvepwbrnf7" path="res://scripts/boat.gd" id="2_qqxp0"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://0ldhpy2ko7nf" path="res://scripts/wind_system.gd" id="4_wind"]
 [ext_resource type="Script" uid="uid://dy6l57si3ntka" path="res://scripts/race_manager.gd" id="5_race"]
 [ext_resource type="Script" uid="uid://fa8tuw3nxxnt" path="res://scripts/island_manager.gd" id="6_islands"]
+[ext_resource type="PackedScene" uid="uid://c1m0jhwp5670u" path="res://3d models/sloop-Body.gltf" id="6_tipki"]
 [ext_resource type="Script" uid="uid://dpw4v5thpygae" path="res://scripts/ui_hud.gd" id="7_hud"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
@@ -56,18 +57,24 @@ script = ExtResource("2_qqxp0")
 shape = SubResource("BoxShape3D_1")
 
 [node name="Hull" type="MeshInstance3D" parent="Boat"]
+visible = false
 material_override = SubResource("StandardMaterial3D_1")
 mesh = SubResource("BoxMesh_1")
 
 [node name="Mast" type="MeshInstance3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+visible = false
 material_override = SubResource("StandardMaterial3D_2")
 mesh = SubResource("CylinderMesh_1")
 
 [node name="Sail" type="MeshInstance3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+visible = false
 material_override = SubResource("StandardMaterial3D_3")
 mesh = SubResource("PlaneMesh_1")
+
+[node name="sloop-Body" parent="Boat" instance=ExtResource("6_tipki")]
+transform = Transform3D(-5.24537e-06, -120, 0, -5.24537e-06, 2.29282e-13, -120, 120, -5.24537e-06, -5.24537e-06, 2.5, -2.2, -4)
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 8, 12)

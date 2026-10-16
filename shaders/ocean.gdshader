@@ -2,9 +2,9 @@ shader_type spatial;
 render_mode diffuse_lambert, specular_schlick_ggx;
 
 uniform vec4 albedo_color : source_color = vec4(0.12, 0.44, 0.82, 1.0);
-uniform float amplitude = 0.8;
-uniform float speed = 0.8;
-uniform float frequency = 1.2;
+uniform float amplitude = 0.14;
+uniform float speed = 0.5;
+uniform float frequency = 0.3;
 
 varying float v_wave_height;
 
